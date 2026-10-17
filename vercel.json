@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "public": true,
+  "name": "blueshify-enterprise-platform",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/styles.css", "destination": "/frontend/styles.css" },
+    { "source": "/app.js", "destination": "/frontend/app.js" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
+}

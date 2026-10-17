@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blueshify | Ocean & River Autonomous Robotics Platform</title>
+  
+  <!-- Fonts: Space Grotesk & DM Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Theme Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Ambient Atmospheric Backlight -->
+  <div class="ambient-glow"></div>
+
+  <div class="app-layout">
+    <!-- ====================================================================
+         1. SIDEBAR NAVIGATION
+         ==================================================================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#overview" class="brand-logo-wrap">
+          <div class="brand-symbol-icon">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="brand-title">blueshify</span>
+        </a>
+        <span class="brand-tag">OPS v1.0</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Operations Console</div>
+        
+        <button class="nav-item active" data-tab="overview">
+          <i data-lucide="layout-dashboard" class="nav-icon"></i>
+          <span>Overview</span>
+        </button>
+
+        <button class="nav-item" data-tab="geospatial">
+          <i data-lucide="map-pin" class="nav-icon"></i>
+          <span>Geospatial Map</span>
+          <span class="nav-badge badge-lime">India</span>
+        </button>
+
+        <button class="nav-item" data-tab="fleet">
+          <i data-lucide="navigation" class="nav-icon"></i>
+          <span>Fleet & Diagnostics</span>
+          <span class="nav-badge badge-cyan" id="sidebar-active-drones-badge">48 Active</span>
+        </button>
+
+        <button class="nav-item" data-tab="impact">
+          <i data-lucide="droplet" class="nav-icon"></i>
+          <span>Impact Metrics</span>
+        </button>
+
+        <div class="nav-section-title">Hardware & Factory</div>
+
+        <button class="nav-item" data-tab="manufacturing">
+          <i data-lucide="cpu" class="nav-icon"></i>
+          <span>Manufacturing & Parts</span>
+          <span class="nav-badge badge-amber" id="sidebar-low-stock-badge">2 Alert</span>
+        </button>
+
+        <div class="nav-section-title">Enterprise Management</div>
+
+        <button class="nav-item" data-tab="financials">
+          <i data-lucide="trending-up" class="nav-icon"></i>
+          <span>Financials & P&L</span>
+        </button>
+
+        <button class="nav-item" data-tab="workforce">
+          <i data-lucide="users" class="nav-icon"></i>
+          <span>Workforce & Staff</span>
+          <span class="nav-badge badge-cyan">142</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="live-indicator-pill">
+          <span class="pulsing-dot"></span>
+          <span>AUTONOMOUS SWARM / LIVE</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         2. MAIN APPLICATION CONTENT
+         ==================================================================== -->
+    <div class="main-wrapper">
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" id="mobile-menu-btn" title="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="page-breadcrumb">
+            <span>Blueshify Enterprise</span>
+            <span>/</span>
+            <strong id="active-breadcrumb">Overview Dashboard</strong>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="header-metric-strip">
+            <div class="header-metric-item">
+              <span>National Plastic Cleared</span>
+              <strong id="header-plastic-counter">184,520 kg</strong>
+            </div>
+            <div style="width: 1px; height: 24px; background: rgba(0, 229, 255, 0.15);"></div>
+            <div class="header-metric-item">
+              <span>Active Deployments</span>
+              <strong>7 Regional Hubs</strong>
+            </div>
+          </div>
+
+          <!-- Mobile App Simulator Toggle -->
+          <button class="btn-simulator-toggle" id="open-simulator-btn" title="Preview Drone Field Mobile App">
+            <i data-lucide="smartphone" style="width: 16px; height: 16px;"></i>
+            <span>Mobile App View</span>
+          </button>
+
+          <!-- Refresh Data Button -->
+          <button class="btn-outline" id="refresh-data-btn" title="Synchronize Telemetry">
+            <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
+            <span>Sync Live</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="content-body">
+        
+        <!-- ==================================================================
+             TAB 1: OVERVIEW DASHBOARD
+             ================================================================== -->
+        <section class="tab-content active" id="tab-overview">
+          <!-- Live Plastic Impact Odometer Banner -->
+          <div class="live-odometer-banner">
+            <div class="odometer-glow-bg"></div>
+            <div class="odometer-left">
+              <h3><i data-lucide="waves" style="width: 18px;"></i> Live Environmental Cleansing Counter</h3>
+              <p>Autonomous surface debris intercepted across Indian rivers, estuaries, and coastal shelves</p>
+              <div class="odometer-counter-wrap">
+                <span class="odometer-digits" id="live-odometer-kg">184,520.4</span>
+                <span class="odometer-unit">KG PICKED UP</span>
+                <span style="color: var(--text-dim); margin-left: 8px;">/</span>
+                <span style="color: var(--accent-lime); font-family: var(--font-mono); font-weight: 700; font-size: 1.4rem; margin-left: 8px;" id="live-odometer-tons">184.52 MT</span>
+              </div>
+            </div>
+
+            <div class="odometer-stats-right">
+              <div class="odometer-stat-box">
+                <span>Active Waterways</span>
+                <strong>7 River & Coasts</strong>
+              </div>
+              <div class="odometer-stat-box">
+                <span>Total Drone Fleets</span>
+                <strong style="color: var(--accent-cyan);">68 Units</strong>
+              </div>
+              <div class="odometer-stat-box">
+                <span>Fleet Avg Battery</span>
+                <strong style="color: var(--accent-emerald);">94.2%</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fleet Overview Card Metrics (Prompt Requirement #2) -->
+          <div class="kpi-grid">
+            <!-- Metric 1: Total Active / Working Drones -->
+            <div class="kpi-card cyan">
+              <div class="kpi-top">
+                <span class="kpi-label">Active Working Drones</span>
+                <div class="kpi-icon"><i data-lucide="play-circle"></i></div>
+              </div>
+              <div class="kpi-value" id="kpi-active-drones">48</div>
+              <div class="kpi-subtext">
+                <span class="kpi-trend-up">● 70.6%</span> of total fleet actively skimming
+              </div>
+            </div>
+
+            <!-- Metric 2: Total Inactive / Idle Drones -->
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">Inactive / Idle Drones</span>
+                <div class="kpi-icon"><i data-lucide="pause-circle"></i></div>
+              </div>
+              <div class="kpi-value" id="kpi-idle-drones">14</div>
+              <div class="kpi-subtext">
+                <span>Charged & standby at regional docking cradles</span>
+              </div>
+            </div>
+
+            <!-- Metric 3: Under Repair / Maintenance Required -->
+            <div class="kpi-card amber">
+              <div class="kpi-top">
+                <span class="kpi-label">Under Repair / Maintenance</span>
+                <div class="kpi-icon"><i data-lucide="wrench"></i></div>
+              </div>
+              <div class="kpi-value" id="kpi-maint-drones">6</div>
+              <div class="kpi-subtext">
+                <span class="kpi-trend-down">LiDAR & seal overhauls</span>
+              </div>
+            </div>
+
+            <!-- Metric 4: Total Revenue (Prompt Requirement #5) -->
+            <div class="kpi-card lime">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Incurred Revenue</span>
+                <div class="kpi-icon"><i data-lucide="indian-rupee"></i></div>
+              </div>
+              <div class="kpi-value">₹4.84 Cr</div>
+              <div class="kpi-subtext">
+                <span class="kpi-trend-up">+18.4%</span> vs previous quarter
+              </div>
+            </div>
+          </div>
+
+          <!-- Overview Map & Diagnostics Split -->
+          <div class="grid-2-col">
+            <!-- Mini Regional Hubs Status -->
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title"><i data-lucide="map" style="color: var(--accent-cyan); width: 18px;"></i> Regional Cleanup Hubs Across India</h3>
+                <button class="btn-outline" onclick="switchTab('geospatial')">Expand Map</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Hub Code</th>
+                      <th>Waterbody / Basin</th>
+                      <th>Active Units</th>
+                      <th>Total Cleared</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overview-hubs-table-body">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Critical Swarm Alerts & Real-time Log -->
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title"><i data-lucide="alert-triangle" style="color: var(--accent-amber); width: 18px;"></i> Operational Alerts & Telemetry Notices</h3>
+                <span class="status-badge working">Autonomous Heartbeat OK</span>
+              </div>
+              <div id="overview-alerts-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 2: GEOSPATIAL & LOCATION OPERATIONS (India Region)
+             (Prompt Requirement #1)
+             ================================================================== -->
+        <section class="tab-content" id="tab-geospatial">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="map-pin" style="color: var(--accent-cyan);"></i> Geospatial Fleet Operations (India Region)</h2>
+              <p>Real-time GPS mapping of autonomous skimming drones, regional river hubs (Ganga, Yamuna, Hooghly, Brahmaputra), coastal ports, and protected cleanup activity zones.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary" id="center-india-btn">
+                <i data-lucide="crosshair" style="width: 15px;"></i> Recenter India
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Map Container -->
+          <div class="map-container-card">
+            <div class="map-header-bar">
+              <!-- Quick Basin Jump Filters -->
+              <div class="map-quick-filters">
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: 700; text-transform: uppercase;">Quick Focus:</span>
+                <button class="map-filter-btn active" data-basin="ALL">All India Swarms</button>
+                <button class="map-filter-btn" data-basin="GANGA">Ganga Basin (Varanasi)</button>
+                <button class="map-filter-btn" data-basin="YAMUNA">Yamuna Corridor (Delhi)</button>
+                <button class="map-filter-btn" data-basin="MUMBAI">Mumbai Arabian Sea</button>
+                <button class="map-filter-btn" data-basin="KOLKATA">Hooghly Estuary</button>
+                <button class="map-filter-btn" data-basin="KOCHI">Vembanad Backwaters</button>
+              </div>
+
+              <!-- Map Legend -->
+              <div class="map-legend">
+                <div class="legend-item"><span class="legend-dot dot-hub"></span> Regional Hub</div>
+                <div class="legend-item"><span class="legend-dot dot-drone-active"></span> Active Skimming</div>
+                <div class="legend-item"><span class="legend-dot dot-drone-idle"></span> Idle/Docked</div>
+                <div class="legend-item"><span class="legend-dot dot-drone-maint"></span> Under Repair</div>
+                <div class="legend-item"><span class="legend-dot dot-zone"></span> Protected Cleanup Zone</div>
+              </div>
+            </div>
+
+            <!-- Leaflet Map Mount Point -->
+            <div id="leaflet-map"></div>
+          </div>
+
+          <!-- Active Debris Zones & Flow Data Cards -->
+          <div class="grid-3-col" id="cleanup-zones-card-grid">
+            <!-- Populated via JS -->
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 3: FLEET & MAINTENANCE MANAGEMENT
+             (Prompt Requirement #2)
+             ================================================================== -->
+        <section class="tab-content" id="tab-fleet">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="navigation" style="color: var(--accent-cyan);"></i> Fleet & Telemetry Diagnostics</h2>
+              <p>Real-time individual drone monitoring: battery cell metrics, LiDAR/Sonar/Optical diagnostics, container fill level, and maintenance event history.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary" onclick="openScheduleServiceModal()">
+                <i data-lucide="plus-circle" style="width: 15px;"></i> Log Maintenance
+              </button>
+            </div>
+          </div>
+
+          <!-- Fleet Overview Metrics -->
+          <div class="kpi-grid">
+            <div class="kpi-card cyan">
+              <div class="kpi-top">
+                <span class="kpi-label">Active / Working Drones</span>
+                <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
+              </div>
+              <div class="kpi-value">48 Units</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">100% Autonomy Engaged</span></div>
+            </div>
+
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">Idle / Standby Drones</span>
+                <div class="kpi-icon"><i data-lucide="battery-charging"></i></div>
+              </div>
+              <div class="kpi-value">14 Units</div>
+              <div class="kpi-subtext"><span>Fast charging at shore stations</span></div>
+            </div>
+
+            <div class="kpi-card amber">
+              <div class="kpi-top">
+                <span class="kpi-label">Under Repair / Maintenance</span>
+                <div class="kpi-icon"><i data-lucide="alert-circle"></i></div>
+              </div>
+              <div class="kpi-value">6 Units</div>
+              <div class="kpi-subtext"><span class="kpi-trend-down">Mean Time To Repair: 18 hrs</span></div>
+            </div>
+
+            <div class="kpi-card lime">
+              <div class="kpi-top">
+                <span class="kpi-label">Avg Payload Collection</span>
+                <div class="kpi-icon"><i data-lucide="package"></i></div>
+              </div>
+              <div class="kpi-value">67.8%</div>
+              <div class="kpi-subtext"><span>Container capacity utilization</span></div>
+            </div>
+          </div>
+
+          <!-- Filterable Fleet Table -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="list" style="color: var(--accent-cyan); width: 18px;"></i> Drone Fleet Telemetry Roster</h3>
+              <div class="panel-controls">
+                <input type="text" id="fleet-search-input" class="input-search" placeholder="Search by Code, Name, Basin, Pilot..." />
+                <select id="fleet-status-filter" class="select-filter">
+                  <option value="ALL">All Statuses</option>
+                  <option value="ACTIVE_WORKING">Active Working</option>
+                  <option value="IDLE_STANDBY">Idle Standby</option>
+                  <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Drone Code</th>
+                    <th>Model Designation</th>
+                    <th>Assigned Hub</th>
+                    <th>Status</th>
+                    <th>Battery Health</th>
+                    <th>Container Fill</th>
+                    <th>LiDAR / Sonar</th>
+                    <th>Assigned Pilot</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="fleet-roster-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 4: ENVIRONMENTAL IMPACT METRICS
+             (Prompt Requirement #3)
+             ================================================================== -->
+        <section class="tab-content" id="tab-impact">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="droplet" style="color: var(--accent-cyan);"></i> Environmental Impact & Plastic Recovery Logs</h2>
+              <p>Auditable plastic intercept ledger filterable by drone ID, region, date range, and plastic density polymer classification.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-outline" onclick="exportImpactLogsCSV()">
+                <i data-lucide="download" style="width: 15px;"></i> Export CSV
+              </button>
+              <button class="btn-primary" onclick="openAddHandoverModal()">
+                <i data-lucide="plus-circle" style="width: 15px;"></i> Log Recovery Handover
+              </button>
+            </div>
+          </div>
+
+          <!-- Impact Metrics Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card cyan">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Plastic Recovered</span>
+                <div class="kpi-icon"><i data-lucide="scale"></i></div>
+              </div>
+              <div class="kpi-value" id="impact-total-kg">184,520 kg</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">184.52 Metric Tons</span> audited</div>
+            </div>
+
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">CO2 Equivalent Mitigated</span>
+                <div class="kpi-icon"><i data-lucide="wind"></i></div>
+              </div>
+              <div class="kpi-value">298.9 Tons</div>
+              <div class="kpi-subtext"><span>Life cycle emissions averted</span></div>
+            </div>
+
+            <div class="kpi-card lime">
+              <div class="kpi-top">
+                <span class="kpi-label">Aquatic Fauna Protected</span>
+                <div class="kpi-icon"><i data-lucide="fish"></i></div>
+              </div>
+              <div class="kpi-value">14,200+</div>
+              <div class="kpi-subtext"><span>Marine & river organisms spared entanglement</span></div>
+            </div>
+
+            <div class="kpi-card amber">
+              <div class="kpi-top">
+                <span class="kpi-label">Verified Recovery Rate</span>
+                <div class="kpi-icon"><i data-lucide="recycle"></i></div>
+              </div>
+              <div class="kpi-value">96.8%</div>
+              <div class="kpi-subtext"><span>Handed over to authorized recyclers</span></div>
+            </div>
+          </div>
+
+          <!-- Polymer Density Classification Breakdown -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="layers" style="color: var(--accent-lime); width: 18px;"></i> Plastic Density & Polymer Composition Breakdown</h3>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Classification per ASTM D7611</span>
+            </div>
+            <div class="grid-3-col" id="polymer-breakdown-cards">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Historical Collection Logs Table with Filters -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="history" style="color: var(--accent-cyan); width: 18px;"></i> Historical Debris Collection Logs</h3>
+              <div class="panel-controls">
+                <input type="text" id="log-drone-filter" class="input-search" placeholder="Filter Drone Code..." />
+                <select id="log-region-filter" class="select-filter">
+                  <option value="ALL">All Regions</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Delhi NCR">Delhi NCR</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Kerala">Kerala</option>
+                </select>
+                <select id="log-density-filter" class="select-filter">
+                  <option value="ALL">All Density Types</option>
+                  <option value="PET_BOTTLES">PET Bottles</option>
+                  <option value="HDPE_CONTAINERS">HDPE Containers</option>
+                  <option value="GHOST_FISHING_NETS">Ghost Fishing Nets</option>
+                  <option value="MACRO_DEBRIS_STYROFOAM">Macro Debris / Styrofoam</option>
+                  <option value="MICROPLASTICS">Microplastics (<5mm)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Log ID</th>
+                    <th>Date & Time</th>
+                    <th>Drone Unit</th>
+                    <th>Regional Waterbody</th>
+                    <th>Plastic Density Type</th>
+                    <th>Weight (KG)</th>
+                    <th>Recovery Partner</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="collection-logs-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 5: DRONE MANUFACTURING & HARDWARE INVENTORY
+             (Prompt Requirement #4)
+             ================================================================== -->
+        <section class="tab-content" id="tab-manufacturing">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="cpu" style="color: var(--accent-cyan);"></i> Drone Manufacturing & Hardware Inventory</h2>
+              <p>Track production pipeline stages (Design, Assembly, QA Testing, Deployed), sensor stocks (LiDAR, optical cameras, sonar), motors, and manufacturing unit economics.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary" onclick="openNewBatchModal()">
+                <i data-lucide="plus-circle" style="width: 15px;"></i> Start Drone Build
+              </button>
+            </div>
+          </div>
+
+          <!-- Manufacturing Pipeline Kanban -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="git-pull-request" style="color: var(--accent-cyan); width: 18px;"></i> Autonomous Drone Assembly Pipeline</h3>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Pune CleanTech Facility</span>
+            </div>
+            
+            <div class="kanban-board">
+              <!-- Stage 1: Design -->
+              <div class="kanban-column" id="kanban-col-design">
+                <div class="kanban-header">
+                  <span class="kanban-title"><i data-lucide="pencil-ruler" style="width: 14px;"></i> 01 / Design</span>
+                  <span class="kanban-counter" id="cnt-stage-design">1</span>
+                </div>
+                <div class="kanban-cards-list" id="cards-stage-design"></div>
+              </div>
+
+              <!-- Stage 2: Assembly -->
+              <div class="kanban-column" id="kanban-col-assembly">
+                <div class="kanban-header">
+                  <span class="kanban-title"><i data-lucide="hammer" style="width: 14px;"></i> 02 / Assembly</span>
+                  <span class="kanban-counter" id="cnt-stage-assembly">1</span>
+                </div>
+                <div class="kanban-cards-list" id="cards-stage-assembly"></div>
+              </div>
+
+              <!-- Stage 3: QA Testing -->
+              <div class="kanban-column" id="kanban-col-qa">
+                <div class="kanban-header">
+                  <span class="kanban-title"><i data-lucide="shield-check" style="width: 14px;"></i> 03 / QA Testing</span>
+                  <span class="kanban-counter" id="cnt-stage-qa">2</span>
+                </div>
+                <div class="kanban-cards-list" id="cards-stage-qa"></div>
+              </div>
+
+              <!-- Stage 4: Deployed -->
+              <div class="kanban-column" id="kanban-col-deployed">
+                <div class="kanban-header">
+                  <span class="kanban-title"><i data-lucide="check-circle" style="width: 14px;"></i> 04 / Deployed</span>
+                  <span class="kanban-counter" id="cnt-stage-deployed">1</span>
+                </div>
+                <div class="kanban-cards-list" id="cards-stage-deployed"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hardware & Critical Sensors Inventory -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="box" style="color: var(--accent-lime); width: 18px;"></i> Critical Sensors & Hardware Spare Parts Inventory</h3>
+              <span class="status-badge working">8 Monitored Sub-assemblies</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Part Code</th>
+                    <th>Component Name</th>
+                    <th>Category</th>
+                    <th>Criticality</th>
+                    <th>Stock Quantity</th>
+                    <th>Threshold</th>
+                    <th>Unit Cost (INR / USD)</th>
+                    <th>Supplier</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Unit Manufacturing Cost vs Deployed Units Chart -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="bar-chart-2" style="color: var(--accent-cyan); width: 18px;"></i> Unit Manufacturing Cost vs. Deployed Unit Scaling</h3>
+              <span style="font-size: 0.8rem; color: var(--accent-lime);">Economies of Scale: -40.8% Cost Per Unit</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="mfgScaleChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 6: FINANCIALS & SALES DASHBOARD
+             (Prompt Requirement #5)
+             ================================================================== -->
+        <section class="tab-content" id="tab-financials">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="trending-up" style="color: var(--accent-cyan);"></i> Financials & Revenue P&L Tracker</h2>
+              <p>Real-time corporate ledger: Total Sales Revenue, Incurred Profits, Net Losses, Cost Grouping Breakdown, and Monthly Performance Analytics.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary" onclick="alert('Exporting Audited Financial P&L Statement for Q2 2026...')">
+                <i data-lucide="file-text" style="width: 15px;"></i> Download P&L Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Revenue & P&L Cards (Prompt Requirement #5) -->
+          <div class="kpi-grid">
+            <!-- Total Revenue -->
+            <div class="kpi-card cyan">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Revenue</span>
+                <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
+              </div>
+              <div class="kpi-value">₹4.84 Cr</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">\$583,100 USD</span> recognized YTD</div>
+            </div>
+
+            <!-- Incurred Profits -->
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">Incurred Profits</span>
+                <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
+              </div>
+              <div class="kpi-value">₹3.49 Cr</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">72.2%</span> Gross Operating Margin</div>
+            </div>
+
+            <!-- Net Losses -->
+            <div class="kpi-card crimson">
+              <div class="kpi-top">
+                <span class="kpi-label">Net Losses / Maintenance</span>
+                <div class="kpi-icon"><i data-lucide="trending-down"></i></div>
+              </div>
+              <div class="kpi-value">₹84.6 L</div>
+              <div class="kpi-subtext"><span>Hull replacements & sensor attrition</span></div>
+            </div>
+
+            <!-- Total Sales Contracts -->
+            <div class="kpi-card lime">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Sales Backlog</span>
+                <div class="kpi-icon"><i data-lucide="award"></i></div>
+              </div>
+              <div class="kpi-value">₹6.20 Cr</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">NMCG + Verra + CSR Offsets</span></div>
+            </div>
+          </div>
+
+          <!-- Financial Charts: Monthly Revenue vs Loss & Cost Breakdown -->
+          <div class="grid-2-col">
+            <!-- Interactive Line Chart: Monthly Revenue vs Hardware/Maint Losses -->
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title"><i data-lucide="line-chart" style="color: var(--accent-cyan); width: 18px;"></i> Monthly Sales Revenue vs. Hardware/Maintenance Losses</h3>
+                <span style="font-size: 0.75rem; color: var(--text-dim);">Values in ₹ Lakhs</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="financialPnlChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Expense Breakdown Donut Chart -->
+            <div class="card-panel">
+              <div class="panel-header">
+                <h3 class="panel-title"><i data-lucide="pie-chart" style="color: var(--accent-lime); width: 18px;"></i> Cost Breakdown Analysis</h3>
+                <span style="font-size: 0.75rem; color: var(--text-dim);">Sensors, Motors, Labor, Overhead</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="costBreakdownChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Contracts Table -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="file-check" style="color: var(--accent-cyan); width: 18px;"></i> Active Municipal, Govt & Corporate Restoration Contracts</h3>
+              <span class="status-badge working">3 Prime Agreements Active</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Contract ID</th>
+                    <th>Partner / Client</th>
+                    <th>Contract Type</th>
+                    <th>Total Value (INR / USD)</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="contracts-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TAB 7: WORKFORCE & HR DIRECTORY
+             (Prompt Requirement #6)
+             ================================================================== -->
+        <section class="tab-content" id="tab-workforce">
+          <div class="section-header">
+            <div class="section-header-text">
+              <h2><i data-lucide="users" style="color: var(--accent-cyan);"></i> Workforce & HR Directory</h2>
+              <p>Total headcount, role category breakdowns, and technician assignment mapping to regional drone hubs and protected cleanup basins.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary" onclick="openAssignModal()">
+                <i data-lucide="user-plus" style="width: 15px;"></i> Reassign Hub
+              </button>
+            </div>
+          </div>
+
+          <!-- Headcount & Category Summary Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card cyan">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Company Headcount</span>
+                <div class="kpi-icon"><i data-lucide="users"></i></div>
+              </div>
+              <div class="kpi-value">142</div>
+              <div class="kpi-subtext"><span class="kpi-trend-up">100% India-based operations</span></div>
+            </div>
+
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">Technical Employees</span>
+                <div class="kpi-icon"><i data-lucide="code-2"></i></div>
+              </div>
+              <div class="kpi-value">68 Staff</div>
+              <div class="kpi-subtext"><span>Software, Hardware & Drone Pilots</span></div>
+            </div>
+
+            <div class="kpi-card lime">
+              <div class="kpi-top">
+                <span class="kpi-label">Management Staff</span>
+                <div class="kpi-icon"><i data-lucide="briefcase"></i></div>
+              </div>
+              <div class="kpi-value">26 Staff</div>
+              <div class="kpi-subtext"><span>Operations Managers & Hub Leads</span></div>
+            </div>
+
+            <div class="kpi-card amber">
+              <div class="kpi-top">
+                <span class="kpi-label">Field & Maintenance</span>
+                <div class="kpi-icon"><i data-lucide="tool"></i></div>
+              </div>
+              <div class="kpi-value">48 Staff</div>
+              <div class="kpi-subtext"><span>Docking technicians & battery handlers</span></div>
+            </div>
+          </div>
+
+          <!-- Workforce Directory Table with Filter Controls -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title"><i data-lucide="contact" style="color: var(--accent-cyan); width: 18px;"></i> Personnel Directory & Regional Hub Assignments</h3>
+              <div class="panel-controls">
+                <input type="text" id="workforce-search-input" class="input-search" placeholder="Search staff name, code, role..." />
+                <select id="workforce-category-filter" class="select-filter">
+                  <option value="ALL">All Categories</option>
+                  <option value="TECHNICAL">Technical</option>
+                  <option value="MANAGEMENT">Management</option>
+                  <option value="FIELD_MAINTENANCE">Field Maintenance</option>
+                </select>
+                <select id="workforce-hub-filter" class="select-filter">
+                  <option value="ALL">All Hubs</option>
+                  <option value="hub-mum-01">Mumbai Hub</option>
+                  <option value="hub-var-01">Varanasi Hub</option>
+                  <option value="hub-del-01">Delhi Hub</option>
+                  <option value="hub-kol-01">Kolkata Hub</option>
+                  <option value="hub-koc-01">Kochi Hub</option>
+                  <option value="hub-guw-01">Guwahati Hub</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Emp ID</th>
+                    <th>Full Name</th>
+                    <th>Role Category</th>
+                    <th>Designation</th>
+                    <th>Assigned Hub</th>
+                    <th>Current Shift</th>
+                    <th>Drones Overseen</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="workforce-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       3. MODALS & FLYOUT DRAWERS
+       ==================================================================== -->
+
+  <!-- DRONE TELEMETRY & SENSOR DIAGNOSTIC MODAL -->
+  <div class="modal-overlay" id="telemetry-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-drone-name">Drone Telemetry & Sensor Diagnostics</h3>
+        <button class="modal-close-btn" onclick="closeTelemetryModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-drone-body">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeTelemetryModal()">Close</button>
+        <button class="btn-primary" id="modal-service-action-btn">Schedule Service Call</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGN STAFF TO REGIONAL HUB MODAL -->
+  <div class="modal-overlay" id="assign-modal">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>Map Personnel to Regional Hub</h3>
+        <button class="modal-close-btn" onclick="closeAssignModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Select Employee</label>
+          <select id="assign-employee-select" class="select-filter" style="width: 100%;">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Assign To Regional Hub</label>
+          <select id="assign-hub-select" class="select-filter" style="width: 100%;">
+            <option value="hub-mum-01">Mumbai Coastal & Port Ops Base (Arabian Sea)</option>
+            <option value="hub-var-01">Varanasi Ganga River Hub (Ganga)</option>
+            <option value="hub-del-01">Delhi Yamuna River Corridor Hub (Yamuna)</option>
+            <option value="hub-kol-01">Kolkata Hooghly Estuary Station (Hooghly)</option>
+            <option value="hub-koc-01">Kochi Vembanad Lake & Port Hub (Vembanad)</option>
+            <option value="hub-viz-01">Visakhapatnam Bay Shelf Station (Bay of Bengal)</option>
+            <option value="hub-guw-01">Guwahati Brahmaputra Rapid Hub (Brahmaputra)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Operational Shift</label>
+          <select id="assign-shift-select" class="select-filter" style="width: 100%;">
+            <option value="General Day (09:00 - 17:00)">General Day (09:00 - 17:00)</option>
+            <option value="Morning River (06:00 - 14:00)">Morning River (06:00 - 14:00)</option>
+            <option value="Night Coastal Patrol (22:00 - 06:00)">Night Coastal Patrol (22:00 - 06:00)</option>
+            <option value="Standby Rapid Response">Standby Rapid Response</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeAssignModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitStaffAssignment()">Confirm Hub Assignment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG PLASTIC RECOVERY MODAL -->
+  <div class="modal-overlay" id="handover-modal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3>Log Verified Plastic Handover</h3>
+        <button class="modal-close-btn" onclick="closeHandoverModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Collecting Drone</label>
+          <select id="modal-handover-drone" class="select-filter" style="width: 100%;">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Plastic Density Type</label>
+          <select id="modal-handover-density" class="select-filter" style="width: 100%;">
+            <option value="PET_BOTTLES">PET Bottles & Packaging</option>
+            <option value="HDPE_CONTAINERS">HDPE Jugs & Drums</option>
+            <option value="GHOST_FISHING_NETS">Ghost Fishing Nets & Lines</option>
+            <option value="MACRO_DEBRIS_STYROFOAM">Macro Debris / Styrofoam</option>
+            <option value="MICROPLASTICS">Microplastics (<5mm)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Weight Picked Up (KG)</label>
+          <input type="number" id="modal-handover-kg" class="input-search" value="385.0" step="0.5" style="width: 100%;" />
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Authorized Recovery Partner</label>
+          <input type="text" id="modal-handover-partner" class="input-search" value="Recykal Circular Solutions" style="width: 100%;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeHandoverModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitHandoverLog()">Record & Update Tonnage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       4. MOBILE APPLICATION SIMULATOR (FIELD PILOT VIEW)
+       ==================================================================== -->
+  <div class="mobile-simulator-overlay" id="simulator-overlay">
+    <div class="simulator-close-bar">
+      <button class="btn-primary" onclick="closeSimulator()" style="box-shadow: 0 0 15px rgba(0,0,0,0.8);">
+        <i data-lucide="x" style="width: 16px;"></i> Close Mobile Preview
+      </button>
+    </div>
+
+    <div class="device-frame">
+      <div class="device-notch">
+        <div class="device-speaker"></div>
+        <div class="device-camera"></div>
+      </div>
+
+      <!-- Mobile Application Viewport -->
+      <div class="mobile-screen-content">
+        <!-- Mobile Header -->
+        <div style="padding: 16px; background: rgba(7, 21, 36, 0.95); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="brand-symbol-icon" style="transform: scale(0.85);">
+              <span></span><span></span><span></span>
+            </div>
+            <strong style="font-size: 1.1rem; color: #fff;">blueshify <span style="color: var(--accent-cyan); font-size: 0.75rem;">MOBILE</span></strong>
+          </div>
+          <span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); padding: 3px 6px; border-radius: 4px; font-weight: 700;">RTK LOCKED</span>
+        </div>
+
+        <!-- Mobile Inner Screen Content -->
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Field Pilot Card -->
+          <div style="background: rgba(11, 30, 50, 0.8); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;">
+            <span style="font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase;">Active Assigned Unit</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+              <strong style="font-size: 1.1rem; color: var(--accent-cyan); font-family: var(--font-mono);" id="mobile-unit-code">BSF-MUM-001</strong>
+              <span class="status-badge working">AUTONOMOUS</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Mahim Bay Coastal Patrol Sector</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;">
+              <div style="background: rgba(4, 13, 22, 0.6); padding: 8px; border-radius: 6px;">
+                <span style="font-size: 0.65rem; color: var(--text-dim);">BATTERY</span>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #fff; font-family: var(--font-mono);" id="mobile-unit-battery">88%</div>
+              </div>
+              <div style="background: rgba(4, 13, 22, 0.6); padding: 8px; border-radius: 6px;">
+                <span style="font-size: 0.65rem; color: var(--text-dim);">PAYLOAD</span>
+                <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-lime); font-family: var(--font-mono);" id="mobile-unit-payload">89.5 KG</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Telemetry Controls -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="alert('Drone mission vector optimized for tidal flow.')">
+              <i data-lucide="compass" style="width: 15px;"></i> Recalculate Skimming Path
+            </button>
+            <button class="btn-outline" style="width: 100%; justify-content: center;" onclick="alert('Return To Shore Cradle command transmitted.')">
+              <i data-lucide="anchor" style="width: 15px;"></i> Recall to Docking Cradle
+            </button>
+            <button style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--accent-crimson); padding: 8px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;" onclick="alert('Emergency Stop broadcasted to thrusters.')">
+              EMERGENCY THRUSTER CUTOFF
+            </button>
+          </div>
+
+          <!-- Mini Swarm Telemetry Log -->
+          <div style="background: rgba(11, 30, 50, 0.5); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px;">
+            <span style="font-size: 0.7rem; color: var(--accent-lime); font-weight: 700; text-transform: uppercase;">Real-Time Obstacle Stream</span>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+              <div>[16:21:04] LiDAR: Cleared 14m fairway</div>
+              <div>[16:21:09] Vision AI: High PET cluster detected</div>
+              <div>[16:21:14] Conveyor: 180 RPM engaged</div>
+              <div>[16:21:19] Flow: 1.4 kts ebb-tide heading 134°</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="mobile-bottom-nav">
+          <button class="mobile-nav-btn active">
+            <i data-lucide="navigation" style="width: 18px;"></i>
+            <span>Fleet</span>
+          </button>
+          <button class="mobile-nav-btn" onclick="alert('Mobile map view active')">
+            <i data-lucide="map" style="width: 18px;"></i>
+            <span>Map</span>
+          </button>
+          <button class="mobile-nav-btn" onclick="alert('Missions view')">
+            <i data-lucide="clipboard-list" style="width: 18px;"></i>
+            <span>Missions</span>
+          </button>
+          <button class="mobile-nav-btn" onclick="alert('User Pilot Profile')">
+            <i data-lucide="user" style="width: 18px;"></i>
+            <span>Profile</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Client Core -->
+  <script src="app.js"></script>
+</body>
+</html>
